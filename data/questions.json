@@ -1,0 +1,12 @@
+[
+  {"topic":"verbal","question":"¿Sinónimo de CAUTO?","options":["Prudente","Audaz","Ingenuo","Rápido"],"answer":"Prudente","xp":20},
+  {"topic":"verbal","question":"Antónimo de DILIGENTE?","options":["Perezoso","Rápido","Activo","Veloz"],"answer":"Perezoso","xp":20},
+  {"topic":"verbal","question":"Analogía: LIBRO es a LEER como PAN es a...","options":["Comer","Horno","Harina","Masa"],"answer":"Comer","xp":20},
+  {"topic":"verbal","question":"Completa: A pesar de su ___ discurso, no convenció","options":["elocuente","breve","confuso","corto"],"answer":"elocuente","xp":20},
+  {"topic":"verbal","question":"¿Qué es un sinónimo de EFÍMERO?","options":["Pasajero","Eterno","Largo","Fuerte"],"answer":"Pasajero","xp":20},
+  {"topic":"math","question":"¿30% de 200 es?","options":["60","30","90","20"],"answer":"60","xp":30},
+  {"topic":"math","question":"Serie: 2, 4, 8, 16, ?","options":["32","24","20","18"],"answer":"32","xp":30},
+  {"topic":"math","question":"Si tienes 3 hermanos y cada uno 2 hijos, ¿cuántos sobrinos?","options":["6","3","2","9"],"answer":"6","xp":30},
+  {"topic":"math","question":"¿Cuánto es 1/2 + 1/4?","options":["3/4","1/4","2/4","1/2"],"answer":"3/4","xp":30},
+  {"topic":"math","question":"Un padre tiene 40 y su hijo 10, ¿en cuántos años el padre tendrá el doble?","options":["20","10","30","15"],"answer":"20","xp":30}
+]
