@@ -1,32 +1,106 @@
-<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Study Rally</title><style>body{background:#0f172a;color:white;font-family:system-ui;text-align:center;margin:0;padding:10px}#box{background:white;color:#0f172a;border-radius:18px;padding:22px;max-width:600px;margin:15px auto;min-height:300px}button{padding:13px;margin:6px;border-radius:12px;border:1px solid #e2e8f0;background:white;width:100%;text-align:left}button.ok{background:#22c55e!important;color:white}button.bad{background:#ef4444!important;color:white}.bar{height:8px;background:#1e293b;border-radius:10px;max-width:600px;margin:10px auto}#fill{height:8px;background:#22c55e;width:0%}</style>
-<script src="translation.js"></script><script src="problem_bank.js"></script><script src="adaptive_ai.js"></script><script src="ranking.js"></script></head>
-<body><h2>🏁 Study Rally</h2><div class="bar"><div id="fill"></div></div><div id="box">Cargando 10 preguntas...</div>
+<!DOCTYPE html>
+<html lang="es">
+<head><style>
+@font-face {
+  font-family: "Optimistic";
+  font-style: normal;
+  font-weight: 400 600;
+  font-display: swap;
+  src: url("/fonts/OptimisticAI_VF_Optimized.woff2") format("woff2");
+}
+@font-face {
+  font-family: "Optimistic Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("/fonts/OptimisticMono_W_TextRegular.woff2") format("woff2");
+}
+:where(html) {
+  font-family: "Optimistic", system-ui, sans-serif;
+}
+:where(code, pre, kbd, samp) {
+  font-family: "Optimistic Mono", ui-monospace, monospace;
+}
+</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Rally - Monday Contest</title>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0d0d12;color:#e6e6e6;font-family:'Inter',sans-serif}
+.pixel{font-family:'Press Start 2P',monospace}
+.hero{position:relative;height:420px;overflow:hidden;border-bottom:4px solid #2a2a3a}
+.hero img{width:100%;height:100%;object-fit:cover}
+.overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,.15),rgba(13,13,18,.92));display:flex;flex-direction:column;justify-content:flex-end;padding:28px}
+.badges{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.bdg{font-size:8px;padding:6px 10px;border-radius:20px;border:1px solid #333;font-family:'Press Start 2P'}
+.live{background:#00ff88;color:#000}.mit{background:#1f6feb;color:#fff}.js{background:#f7df1e;color:#000}.peru{background:#d91023;color:#fff}
+.wrap{max-width:1100px;margin:0 auto;padding:20px;display:grid;grid-template-columns:2fr 1fr;gap:20px}
+@media(max-width:850px){.wrap{grid-template-columns:1fr}.hero{height:300px}}
+.card{background:#15151f;border:2px solid #2a2a3a;border-radius:12px;padding:18px}
+.bar{width:90px;height:12px;background:#0a0a0f;border:2px solid #333}
+.fill{height:100%;transition:width .3s}
+.fill.life{background:linear-gradient(90deg,#00ff88,#00cc6a);width:100%}
+.fill.xp{background:linear-gradient(90deg,#58a6ff,#1f6feb);width:0%}
+.q{font-size:18px;font-weight:700;margin:14px 0;min-height:50px;line-height:1.4}
+.answers{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ans{background:#1e1e2f;border:2px solid #333;padding:14px;border-radius:8px;cursor:pointer;color:#eee;text-align:left;font-weight:600}
+.ans:hover{border-color:#58a6ff;transform:translateY(-2px)}
+.ans.ok{background:#00ff88;color:#000;border-color:#00ff88}
+.ans.bad{background:#ff4444;color:#fff;border-color:#ff4444}
+.play{width:100%;padding:18px;background:linear-gradient(90deg,#00ff88,#00cc6a);color:#000;border:none;border-radius:10px;font-family:'Press Start 2P';font-size:13px;cursor:pointer}
+.rank{list-style:none}.rank li{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #222;font-size:13px}.top{color:#ffd700;font-weight:700}
+</style>
+</head>
+<body>
+<div class="hero">
+<img src="./833959578_29131097913149165_8243443961797880846_n-1.webp" alt="Study Rally Banner">
+<div class="overlay">
+<h1 class="pixel" style="font-size:28px;text-shadow:0 0 20px #00ff88">STUDY RALLY</h1>
+<p style="color:#bbb;max-width:620px;margin:8px 0">Gamify your study sessions. Race against time, compete with friends, and turn learning into a rally championship. Made in Peru 🇵🇪</p>
+<div class="badges"><span class="bdg live">● Live Demo</span><span class="bdg mit">MIT</span><span class="bdg js">JavaScript</span><span class="bdg peru">Made in Peru</span></div>
+</div></div>
+<div class="wrap">
+<div class="card">
+<div style="display:flex;justify-content:space-between;align-items:center">
+<div style="display:flex;gap:10px;align-items:center">❤️<div class="bar"><div class="fill life" id="lb"></div></div></div>
+<div style="display:flex;gap:10px;align-items:center">⭐<div class="bar"><div class="fill xp" id="xb"></div></div></div>
+<span class="pixel" style="font-size:9px;color:#58a6ff" id="qn">READY?</span>
+</div>
+<div id="start">
+<div class="q">You are the protagonist. Win your university vacancy by leveling up your Math & Verbal Reasoning score.</div>
+<p style="color:#888;margin-bottom:16px;font-size:13px">10 preguntas • Top 15 • IA adaptativa</p>
+<button class="play" onclick="start()">▶ PLAY NOW</button>
+</div>
+<div id="game" style="display:none"><div class="q" id="qt"></div><div class="answers" id="aw"></div><div style="height:5px;background:#0a0a0f;margin-top:12px;border-radius:3px"><div id="tm" style="height:100%;background:#00ff88;width:100%"></div></div></div>
+<div id="end" style="display:none;text-align:center"><div style="font-size:48px">🏆</div><h2 class="pixel" style="font-size:14px;margin:12px 0">RALLY COMPLETADO!</h2><div style="font-size:32px;font-weight:800;color:#00ff88" id="fs">0/10</div><p id="fm" style="color:#aaa"></p><input id="pn" placeholder="Tu nombre" style="width:100%;padding:10px;background:#0a0a0f;border:2px solid #333;border-radius:8px;color:#fff;margin:10px 0"><button class="play" onclick="save()">GUARDAR + WA</button><button onclick="start()" style="margin-top:10px;background:transparent;border:1px solid #333;color:#888;padding:8px 16px;border-radius:8px;cursor:pointer;width:100%">JUGAR DE NUEVO</button></div>
+</div>
+<div>
+<div class="card" style="margin-bottom:16px"><h3 class="pixel" style="font-size:9px;color:#ffd700;margin-bottom:10px">🏆 LIVE RANKING TOP 15</h3><ul class="rank" id="rk"><li style="color:#666">Sin jugadores aún</li></ul></div>
+<div class="card"><h3 class="pixel" style="font-size:9px;margin-bottom:10px">ABOUT</h3><p style="font-size:12px;color:#aaa">85c-inspired arcade gamification. Duolingo meets Pomodoro.</p></div>
+</div></div>
 <script>
-let idx=0,pts=0,falladas=[],LANG="es",start=Date.now();
-async function init(){
- let bank = ProblemBank.local || ProblemBank.bank;
- let reto = [...bank].sort(()=>0.5-Math.random()).slice(0,10);
- while(reto.length<10) reto.push({...bank[reto.length%bank.length]});
- reto.forEach(p=>{p.q=p.q0||p.q; p.ops=p.ops0||p.ops; p.c=p.c0??p.c;});
- window.reto10=reto; show();
-}
-function show(){
- let box=document.getElementById('box');
- if(idx>=10){
-   let t=Math.floor((Date.now()-start)/1000);
-   let n=prompt(`Fin: ${pts}/10 en ${t}s - Tu nombre:`)||"Anonimo";
-   Ranking.save(n,pts,t,"es");
-   box.innerHTML=Ranking.getHTML(); return;
- }
- let p=reto10[idx];
- box.innerHTML=`<small>${idx+1}/10 - ${p.tema||''}</small><h3>${p.q}</h3>`+p.ops.map((o,i)=>`<button onclick="go(${i})">${String.fromCharCode(65+i)}) ${o}</button>`).join('');
- document.getElementById('fill').style.width=((idx+1)*10)+"%";
-}
-function go(s){
- let p=reto10[idx]; let ok=s===p.c;
- document.querySelectorAll('button').forEach((b,i)=>{if(i===p.c)b.classList.add('ok');else if(i===s)b.classList.add('bad');});
- if(!ok) falladas.push(p); else pts++;
- setTimeout(()=>{idx++;show();},600);
-}
-init();
-</script></body></html>
+const bank=[
+{q:"5 gallinas ponen 5 huevos en 5 dias, cuantas ponen 20 huevos en 20 dias?",a:["5","20","4","10"],c:0},
+{q:"Halla x: 2x+3=15",a:["6","5","7","8"],c:0},
+{q:"Sinonimo de efimero",a:["Duradero","Pasajero","Eterno","Fuerte"],c:1},
+{q:"Tren a 60km/h recorre 180km en:",a:["2h","3h","4h","3.5h"],c:1},
+{q:"Antonimo de prodigo",a:["Generoso","Avaro","Rico","Pobre"],c:1},
+{q:"Area cuadrado lado 5",a:["20","25","10","15"],c:1},
+{q:"'tus ojos son dos luceros' es:",a:["Metafora","Hiperbole","Simil","Anafora"],c:0},
+{q:"Si 3x=12, x² vale:",a:["16","8","4","12"],c:0},
+{q:"Estudie mucho, ____ no ingrese",a:["porque","sin embargo","ademas","entonces"],c:1},
+{q:"50% de 200 es:",a:["50","100","150","25"],c:1},
+{q:"10 cabezas y 28 patas, conejos y gallinas:",a:["4c 6g","6c 4g","5 y 5","2 y 8"],c:0},
+];
+let qs=[],i=0,sc=0,lv=5,t;
+function start(){qs=[...bank].sort(()=>0.5-Math.random()).slice(0,10);i=0;sc=0;lv=5;document.getElementById('start').style.display='none';document.getElementById('end').style.display='none';document.getElementById('game').style.display='block';document.getElementById('lb').style.width='100%';document.getElementById('xb').style.width='0%';show();}
+function show(){if(i>=qs.length){fin();return}const q=qs[i];document.getElementById('qn').textContent=(i+1)+"/10";document.getElementById('qt').textContent=q.q;const d=document.getElementById('aw');d.innerHTML='';q.a.forEach((txt,j)=>{let b=document.createElement('button');b.className='ans';b.textContent=txt;b.onclick=()=>chk(j);d.appendChild(b)});let w=100;clearInterval(t);t=setInterval(()=>{w-=0.4;document.getElementById('tm').style.width=w+'%';if(w<=0){clearInterval(t);chk(-1)}},40)}
+function chk(j){clearInterval(t);const q=qs[i];const bs=document.querySelectorAll('.ans');bs.forEach((b,k)=>{if(k==q.c)b.classList.add('ok');if(k==j&&j!=q.c)b.classList.add('bad');b.disabled=true});if(j==q.c){sc++;document.getElementById('xb').style.width=sc*10+'%'}else{lv--;document.getElementById('lb').style.width=lv*20+'%'}setTimeout(()=>{i++;show()},800)}
+function fin(){document.getElementById('game').style.display='none';document.getElementById('end').style.display='block';document.getElementById('fs').textContent=sc+'/10';document.getElementById('fm').textContent=sc>=8?'¡Pro! Listo para la uni':sc>=5?'¡Bien! Sigue entrenando':'¡No te rindas!';load()}
+function save(){const n=document.getElementById('pn').value||'Anónimo';let r=JSON.parse(localStorage.getItem('rally_rank')||'[]');r.push({name:n,score:sc});r.sort((a,b)=>b.score-a.score);localStorage.setItem('rally_rank',JSON.stringify(r.slice(0,15)));load();let tx='Saque '+sc+'/10 en Study Rally! Juega: https://maycolaq.github.io/study-rally/';window.open('https://wa.me/?text='+encodeURIComponent(tx),'_blank')}
+function load(){let r=JSON.parse(localStorage.getItem('rally_rank')||'[]');let ul=document.getElementById('rk');if(!r.length){ul.innerHTML='<li style=color:#666>Sin jugadores aún</li>';return}ul.innerHTML=r.map((x,k)=>'<li class='+(k<3?'top':'')+'><span>'+(k+1)+'. '+x.name+'</span><span>'+x.score+'/10</span></li>').join('')}load();
+</script>
+<script>(function(){var loc=location.href.replace(/#.*$/,"");var ATTR_NAMES=["data-product-id","data-productid","data-product_id","product-id","productid","product_id","data-source-entity-id","source-entity-id","source_entity_id","data-product","data-metadata","data-meta"];var DATASET_KEYS=["productId","productid","product_id","sourceEntityId","sourceentityid","source_entity_id","product","metadata","meta"];function readProductId(value){if(typeof value!=="string"||value.length===0)return null;if(/^[0-9]{6,}$/.test(value))return value;var match=value.match(/(?:product(?:_|-)?id|source(?:_|-)?entity(?:_|-)?id)["'=:\s]+([0-9]{6,})/i);return match?match[1]:null}function extractProductId(start){for(var node=start;node&&node!==document.body;node=node.parentElement){for(var i=0;i<ATTR_NAMES.length;i++){var attrValue=node.getAttribute&&node.getAttribute(ATTR_NAMES[i]);var attrProductId=readProductId(attrValue);if(attrProductId)return attrProductId}var dataset=node.dataset||null;if(dataset){for(var j=0;j<DATASET_KEYS.length;j++){var dataValue=dataset[DATASET_KEYS[j]];var dataProductId=readProductId(dataValue);if(dataProductId)return dataProductId}}}return null}function isInlineMediaSlotElement(node){return !!(node&&node.getAttribute&&node.getAttribute("data-clippy-inline-media-slot")!==null)}function findInlineMediaSlot(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(isInlineMediaSlotElement(node))return node}return null}function readInlineMediaUrl(node){if(!node)return null;return node.getAttribute&&((node.getAttribute("data-clippy-inline-media-url")||node.getAttribute("data-url")||node.getAttribute("data_url")))||node.href||null}function stripHash(url){return String(url).replace(/#.*$/,"")}function urlsMatch(a,b){if(!a||!b)return false;try{return stripHash(new URL(a,loc).href)===stripHash(new URL(b,loc).href)}catch(_){return stripHash(a)===stripHash(b)}}function isFirstPartyReelUrl(value){try{var url=new URL(value,loc);if(url.protocol!=="https:")return false;var host=url.hostname.toLowerCase();var supported=host==="instagram.com"||host.endsWith(".instagram.com")||host==="facebook.com"||host.endsWith(".facebook.com");return supported&&/\/reels?\//i.test(url.pathname)}catch(_){return false}}function isInlineMediaUrlClick(node,href){var slot=findInlineMediaSlot(node);if(!slot)return false;var slotUrl=readInlineMediaUrl(slot);if(slotUrl)return urlsMatch(href,slotUrl);return isFirstPartyReelUrl(href)}function findDataHref(start){for(var node=start;node&&node!==document.body;node=node.parentElement){if(node.getAttribute){var href=node.getAttribute("data-href")||node.getAttribute("data-url");if(href)return{href:href,node:node}}}return null}var nativeOpen=window.open;window.open=function(url){if(parent!==window&&typeof url==="string"&&/^https?:\/\//.test(url)){parent.postMessage({type:"ecto:usercontent-link-click",href:url},"*");return null}return nativeOpen?nativeOpen.apply(window,arguments):null};document.addEventListener("click",function(e){var target=e.target instanceof Element?e.target:null;if(!target)return;if(parent===window)return;var a=target.closest?target.closest("a[href]"):null;if(a&&a.href&&/^https?:\/\//.test(a.href)&&a.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(a,a.href))return;var productId=extractProductId(target)||extractProductId(a);if(productId){e.preventDefault();parent.postMessage({type:"ecto-artifact-link-click",productId:productId},"*");return}e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:a.href},"*");return}var dataHref=findDataHref(target);if(dataHref&&/^https?:\/\//.test(dataHref.href)&&dataHref.href.replace(/#.*$/,"")!==loc){if(isInlineMediaUrlClick(dataHref.node,dataHref.href))return;e.preventDefault();parent.postMessage({type:"ecto:usercontent-link-click",href:dataHref.href},"*")}},true)})();</script><script>(function(){var FOCUS_TYPE="ecto:artifact-focus-request";var CLOSE_TYPE="ecto:artifact-close-request";function focusArtifactDocument(){var body=document.body;if(!body)return;try{window.focus();}catch(e){}if(!body.hasAttribute("tabindex"))body.setAttribute("tabindex","-1");try{body.focus({preventScroll:true});}catch(e){try{body.focus();}catch(e2){}}}window.addEventListener("message",function(event){if(event.source!==window.parent)return;var data=event.data;if(!data||typeof data!=="object"||data.type!==FOCUS_TYPE)return;if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",focusArtifactDocument,{once:true});return;}focusArtifactDocument();});window.addEventListener("keydown",function(event){if(event.key!=="Escape")return;window.setTimeout(function(){if(event.defaultPrevented)return;window.parent.postMessage({type:CLOSE_TYPE},"*");},0);});})();</script></body>
+</html>
