@@ -37,3 +37,18 @@
 - 📱 **Mobile First** - Perfect for WhatsApp sharing
 
 ### 🛠️ Built with
+# 🎮 STUDY RALLY - Monday Contest
+> You are the protagonist. Win your university vacancy by leveling up your Math & Verbal Reasoning score. A RPG game from Peru 🇵🇪.
+
+[![Live Demo](https://img.shields.io/badge/🚀_Live_Demo-Play_Now-00ff88?style=for-the-badge)](https://maycolaq.github.io/study-rally/)
+[![MIT](https://img.shields.io/badge/License-MIT-1f6feb?style=for-the-badge)](LICENSE)
+[![JavaScript](https://img.shields.io/badge/Built_with-JavaScript-F7DF1E?style=for-the-badge)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
+[![Peru](https://img.shields.io/badge/Made_in-Peru🇵🇪-d91023?style=for-the-badge)](https://github.com/MaycolAQ)
+
+![Banner](./833959578_29131097913149165_8243443961797880846_n-1.webp)
+
+### 🎥 Video Presentación
+[![Video](https://img.youtube.com/vi/xJPoombsQX4/0.jpg)](https://youtube.com/shorts/xJPoombsQX4?si=GhXWtDYguTXi3x1k)
+**▶️ Shorts:** https://youtube.com/shorts/xJPoombsQX4?si=GhXWtDYguTXi3x1k
+
+🚀 **Play:** https://maycolaq.github.io/study-rally/
