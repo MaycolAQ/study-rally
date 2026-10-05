@@ -2,29 +2,101 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Study Rally PRO - 3 Rows</title>
+<title>Study Rally PRO</title>
 <style>
 body{background:#0f172a;color:white;font-family:system-ui;text-align:center;margin:0;padding:10px}
 #box{background:white;color:#0f172a;border-radius:18px;padding:22px;max-width:600px;margin:15px auto;min-height:350px}
-button{padding:13px;margin:6px;border-radius:12px;border:1px solid #e2e8f0;background:white;width:100%;text-align:left;cursor:pointer}
-button.correct{background:#22c55e!important;color:white}button.wrong{background:#ef4444!important;color:white}
-select{background:#1e293b;color:white;border-radius:8px;padding:8px;border:1px solid #334155}
-.bar{height:8px;background:#1e293b;border-radius:10px;max-width:600px;margin:10px auto}#fill{height:8px;background:#22c55e;width:0%;border-radius:10px;transition:.3s}
+button{padding:13px;margin:6px;border-radius:12px;border:1px solid #e2e8f0;background:white;width:100%;text-align:left}
+button.ok{background:#22c55e!important;color:white}button.bad{background:#ef4444!important;color:white}
+select{background:#1e293b;color:white;border-radius:8px;padding:8px}
+.bar{height:8px;background:#1e293b;border-radius:10px;max-width:600px;margin:10px auto}#fill{height:8px;background:#22c55e;width:0%;border-radius:10px}
 </style>
 <script src="translation.js"></script>
 <script src="problem_bank.js"></script>
 <script src="adaptive_ai.js"></script>
 </head>
 <body>
-<div style="display:flex;justify-content:space-between;max-width:600px;margin:auto;align-items:center">
-<h2 style="margin:0">🏁 Rally PRO</h2>
+<h2>🏁 Rally PRO - 3 Filas</h2>
 <select id="idioma" onchange="changeLang()">
 <option value="es">🇵🇪 ES</option><option value="en">🇺🇸 EN</option><option value="pt">🇧🇷 PT</option><option value="fr">🇫🇷 FR</option>
 </select>
-</div>
-<div id="estado" style="color:#94a3b8;font-size:12px;margin:5px">✅ 3 Rows: Translation + Internet + Adaptive AI</div>
+<div id="estado" style="color:#94a3b8;font-size:12px">✅ Cargado</div>
 <div class="bar"><div id="fill"></div></div>
-<div id="box">Cargando Rally PRO...</div>
+<div id="box">Cargando...</div>
 
 <script>
-let LANG="es", idx=0, pts=
+let LANG="es", idx=0, pts=0, falladas=[], fase="reto", cola=[], reto10=[];
+
+async function init(){
+ try{
+  document.getElementById('box').innerHTML="Cargando problemas...";
+  if(typeof ProblemBank==="undefined"){document.getElementById('box').innerHTML="Falta problem_bank.js - subelo"; return;}
+  reto10 = await ProblemBank.generateRally(10, LANG);
+  if(!reto10 || reto10.length===0) reto10 = ProblemBank.local.map(p=>({...p,q:p.q0,ops:[...p.ops0],id:"local"}));
+  console.log("Rally:",reto10);
+  show();
+ }catch(e){
+  document.getElementById('box').innerHTML="Error: "+e.message;
+  console.log(e);
+ }
+}
+async function changeLang(){
+ LANG=document.getElementById('idioma').value;
+ document.getElementById('estado').innerText="🌐 Traduciendo...";
+ for(let p of reto10){
+   p.q = await TranslationEngine.translate(p.q0, LANG);
+   p.ops = [];
+   for(let op of p.ops0) p.ops.push(await TranslationEngine.translate(op, LANG));
+ }
+ document.getElementById('estado').innerText="🌐 Listo";
+ show();
+}
+function show(){
+ let box=document.getElementById('box');
+ if(fase==="reto"){
+   if(idx>=10){
+     let html=`<h2>Puntaje ${pts}/10</h2>`;
+     if(falladas.length>0){
+       html+=`<p>Fallaste en: ${[...new Set(falladas.map(f=>f.tema))].join(', ')}</p><button onclick="startAI()" style="text-align:center;background:#22c55e;color:white">🧠 IA Training - Fila 3</button>`;
+     }else{
+       html+=`<button onclick="location.reload()" style="text-align:center;background:#0f172a;color:white">Nuevo reto</button>`;
+     }
+     box.innerHTML=html;return;
+   }
+   let p=reto10[idx];
+   let html=`<small>${idx+1}/10 - ${p.tema} - ${p.id||''}</small><h3>${p.q}</h3>`;
+   if(p.g) html+=`<div style="background:#f1f5f9;padding:6px;border-radius:8px;font-size:12px">${p.g}</div>`;
+   p.ops.forEach((op,i)=>html+=`<button onclick="responder(${i})">${String.fromCharCode(65+i)}) ${op}</button>`);
+   box.innerHTML=html;
+   document.getElementById('fill').style.width=((idx+1)*10)+"%";
+ }else{
+   if(cola.length===0){box.innerHTML=`<h2>🎉 Entrenamiento listo ${pts}/10</h2><button onclick="location.reload()" style="text-align:center">Nuevo rally</button>`;return;}
+   let p=cola[0];
+   let html=`<small>🤖 ${p.tema} | ${p.g||'IA'}</small><h3>${p.q}</h3>`;
+   p.ops.forEach((op,i)=>html+=`<button onclick="responder(${i})">${String.fromCharCode(65+i)}) ${op}</button>`);
+   box.innerHTML=html;
+ }
+}
+function responder(s){
+ let p=fase==="reto"?reto10[idx]:cola[0];
+ let ok=s===p.c;
+ document.querySelectorAll('#box button').forEach((b,i)=>{if(i===p.c)b.classList.add('ok');else if(i===s)b.classList.add('bad');b.disabled=true;});
+ if(fase==="reto"){
+   if(!ok){falladas.push(p); AdaptiveAI.learn(p);}else pts++;
+   setTimeout(()=>{idx++;show();},800);
+ }else{
+   box=document.getElementById('box');
+   box.innerHTML+=`<div style="background:#fef3c7;padding:8px;border-radius:8px;margin-top:8px">${ok?'✅ Correcto':'❌ Era '+String.fromCharCode(65+p.c)} | Nivel: ${AdaptiveAI.getLevel(p.tema)}</div><button onclick="sig(${ok})" style="text-align:center;background:#0f172a;color:white;margin-top:8px">Continuar →</button>`;
+ }
+}
+function sig(ok){if(ok)cola.shift();else cola.push(cola.shift());show();}
+async function startAI(){
+ fase="practica";
+ document.getElementById('box').innerHTML=`<div style="padding:20px">🧠 Creando entrenamiento IA...<br>Para: ${[...new Set(falladas.map(f=>f.tema))].join(', ')}</div>`;
+ cola = await AdaptiveAI.buildTraining(falladas, LANG);
+ show();
+}
+init();
+</script>
+</body>
+</html>
