@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Study Rally PRO - 3 Rows</title>
+<style>
+body{background:#0f172a;color:white;font-family:system-ui;text-align:center;margin:0;padding:10px}
+#box{background:white;color:#0f172a;border-radius:18px;padding:22px;max-width:600px;margin:15px auto;min-height:350px}
+button{padding:13px;margin:6px;border-radius:12px;border:1px solid #e2e8f0;background:white;width:100%;text-align:left;cursor:pointer}
+button.correct{background:#22c55e!important;color:white}button.wrong{background:#ef4444!important;color:white}
+select{background:#1e293b;color:white;border-radius:8px;padding:8px;border:1px solid #334155}
+.bar{height:8px;background:#1e293b;border-radius:10px;max-width:600px;margin:10px auto}#fill{height:8px;background:#22c55e;width:0%;border-radius:10px;transition:.3s}
+</style>
+<script src="translation.js"></script>
+<script src="problem_bank.js"></script>
+<script src="adaptive_ai.js"></script>
+</head>
+<body>
+<div style="display:flex;justify-content:space-between;max-width:600px;margin:auto;align-items:center">
+<h2 style="margin:0">🏁 Rally PRO</h2>
+<select id="idioma" onchange="changeLang()">
+<option value="es">🇵🇪 ES</option><option value="en">🇺🇸 EN</option><option value="pt">🇧🇷 PT</option><option value="fr">🇫🇷 FR</option>
+</select>
+</div>
+<div id="estado" style="color:#94a3b8;font-size:12px;margin:5px">✅ 3 Rows: Translation + Internet + Adaptive AI</div>
+<div class="bar"><div id="fill"></div></div>
+<div id="box">Cargando Rally PRO...</div>
+
+<script>
+let LANG="es", idx=0, pts=
