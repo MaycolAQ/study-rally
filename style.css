@@ -1,0 +1,5 @@
+body{background:#0d1117;color:white;font-family:monospace;text-align:center;margin:0;padding:20px}
+#game{max-width:500px;margin:auto;border:2px solid #39d353;padding:20px;border-radius:12px}
+button{background:#39d353;color:black;border:none;padding:12px 20px;margin:5px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:16px}
+button:disabled{background:gray}
+#questionBox{margin-top:20px;text-align:left}
