@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Study Rally - Perú Global</title>
+<style>
+body{background:#0f172a;color:white;font-family:system-ui;text-align:center;margin:0;padding:10px}
+#box{background:white;color:#0f172a;border-radius:18px;padding:22px;max-width:600px;margin:15px auto;min-height:320px}
+button{padding:13px;margin:6px;border-radius:12px;border:1px solid #e2e8f0;background:white;width:100%;text-align:left;cursor:pointer}
+button.correct{background:#22c55e!important;color:white} button.wrong{background:#ef4444!important;color:white}
+select{background:#1e293b;color:white;border-radius:8px;padding:8px;border:1px solid #334155}
+.bar{height:8px;background:#1e293b;border-radius:10px;max-width:600px;margin:10px auto} #fill{height:8px;background:#22c55e;width:0%;border-radius:10px;transition:.3s}
+</style>
+</head>
+<body>
+<div style="display:flex;justify-content:space-between;max-width:600px;margin:auto;align-items:center">
+<h2 style="margin:0">🏁 Study Rally</h2>
+<select id="idioma" onchange="cambiarIdioma()">
+<option value="es">🇵🇪 Español</option>
+<option value="en">🇺🇸 English</option>
+<option value="zh">🇨🇳 中文</option>
+<option value="hi">🇮🇳 हिन्दी</option>
+<option value="ar">🇸🇦 العربية</option>
+<option value="pt">🇧🇷 Português</option>
+<option value="fr">🇫🇷 Français</option>
+<option value="ru">🇷🇺 Русский</option>
+<option value="bn">🇧🇩 বাংলা</option>
+<option value="qu">🏔️ Quechua</option>
+</select>
+</div>
+<div id="estado" style="color:#94a3b8;font-size:12px">🌐 Anti-plagio + Traducción IA</div>
+<div class="bar"><div id="fill"></div></div>
+<div id="box">Cargando examen único...</div>
+
+<script>
+let LANG="es", idx=0, pts=0, falladas=[], aciertos=[], fase="reto", cola=[];
+
+let T={
+ es:{preg:"Pregunta",puntaje:"Tu puntaje",ok:"¡Aprobaste!",no:"A practicar",pract:"Para practicar",ia:"🧠 Aprendizaje con IA",cont:"Continuar",trad:"Traducido por IA"},
+ en:{preg:"Question",puntaje:"Your Score",ok:"Passed!",no:"Keep practicing",pract:"To practice",ia:"🧠 AI Learning",cont:"Continue",trad:"Translated by AI"},
+ zh:{preg:"问题",puntaje:"你的分数",ok:"通过!",no:"继续",pract:"练习",ia:"🧠 AI学习",cont:"继续",trad:"AI翻译"},
+ hi:{preg:"प्रश्न",puntaje:"स्कोर",ok:"पास!",no:"अभ्यास",pract:"अभ्यास",ia:"🧠 AI सीखना",cont:"जारी",trad:"AI अनुवाद"},
+ ar:{preg:"سؤال",puntaje:"نتيجتك",ok:"نجحت!",no:"استمر",pract:"ممارسة",ia:"🧠 تعلم AI",cont:"استمر",trad:"ترجمة AI"},
+ pt:{preg:"Pergunta",puntaje:"Sua nota",ok:"Aprovado!",no:"Pratique",pract:"Praticar",ia:"🧠 Aprendizado IA",cont:"Continuar",trad:"Traduzido por IA"},
+ fr:{preg:"Question",puntaje:"Score",ok:"Réussi!",no:"Pratiquez",pract:"Pratiquer",ia:"🧠 Apprentissage IA",cont:"Continuer",trad:"Traduit par IA"},
+ ru:{preg:"Вопрос",puntaje:"Счет",ok:"Сдал!",no:"Практикуй",pract:"Практика",ia:"🧠 Обучение ИИ",cont:"Продолжить",trad:"Перевод ИИ"},
+ bn:{preg:"প্রশ্ন",puntaje:"স্কোর",ok:"পাস!",no:"অভ্যাস",pract:"অভ্যাস",ia:"🧠 AI শেখা",cont:"চালিয়ে",trad:"AI অনুবাদ"},
+ qu:{preg:"Tapuy",puntaje:"Score",ok:"Allin!",no:"Yachaykuy",pract:"Yachanapaq",ia:"🧠 IA yachachiy",cont:"Qatiy",trad:"IA tikrasqa"}
+};
+
+// TRADUCTOR IA - diccionario + IA
+async function traducirIA(texto, lang){
+ if(lang==="es") return texto;
+ const d={
+  "Sinónimo de ACLARAR":{en:"Synonym of CLARIFY",zh:"澄清的同义词",hi:"स्पष्ट करने का पर्याय",ar:"مرادف توضيح",pt:"Sinônimo de ESCLARECER",fr:"Synonyme de CLARIFIER",ru:"Синоним ПРОЯСНИТЬ",bn:"স্পষ্ট করার প্রতিশব্দ",qu:"ACLARARpaq sinonimo"},
+  "Si 2 lapiceros cuestan S/6, ¿5 cuánto?":{en:"If 2 pens cost $6, how much for 5?",zh:"2支笔6元，5支多少钱？",hi:"2 पेन 6 रु, 5 का कितना?",ar:"قلمين بـ6، كم 5؟",pt:"2 canetas R$6, quanto 5?",fr:"2 stylos 6, combien 5?",ru:"2 ручки 6, сколько 5?",bn:"2 কলম 6 টাকা, 5 কত?",qu:"2 lapicero S/6, 5 hayk'aq?"},
+  "Serie: 2,4,8,16...":{en:"Series: 2,4,8,16...",zh:"数列: 2,4,8,16...",hi:"श्रृंखला: 2,4,8,16...",ar:"متتالية: 2,4,8,16...",pt:"Sequência: 2,4,8,16...",fr:"Série: 2,4,8,16...",ru:"Ряд: 2,4,8,16...",bn:"ধারা: 2,4,8,16...",qu:"Serie: 2,4,8,16..."}
+ };
+ if(d[texto] && d[texto][lang]) return d[texto][lang];
+ return texto;
+}
+
+let BANCO_TOTAL={
+ verbal:[
+ {q:"Sinónimo de ACLARAR",ops:["Confundir","Explicar","Tapar","Esconder","Enredar"],c:1,tema:"sinonimo"},
+ {q:"Sinónimo de RESOLVER",ops:["Complicar","Solucionar","Romper","Esconder","Perder"],c:1,tema:"sinonimo"},
+ {q:"Sinónimo de DILUCIDAR",ops:["Aclarar","Oscurecer","Tapar","Enredar","Complicar"],c:0,tema:"sinonimo"},
+ {q:"Antónimo de EFÍMERO",ops:["Breve","Eterno","Corto","Fugaz","Pasajero"],c:1,tema:"antonimo"},
+ {q:"Completa: Estudié mucho, ___ aprobé",ops:["por eso","aunque","pero","ya que","sin embargo"],c:0,tema:"conectores"},
+ {q:"MÉDICO es a HOSPITAL como PROFESOR es a:",ops:["Colegio","Avión","Cocina","Calle","Parque"],c:0,tema:"analogia"},
+ {q:"Palabra que NO pertenece",ops:["Alegre","Contento","Feliz","Triste","Dichoso"],c:3,tema:"exclusion"},
+ {q:"Si todos los gatos son animales. Algunos animales vuelan.",ops:["Todos vuelan","No se puede concluir","Ninguno vuela","Algunos vuelan","Algunos son gatos"],c:1,tema:"logica"},
+ {q:"PANADERO es a PAN como CARPINTERO es a:",ops:["Madera","Mueble","Casa","Árbol","Sierra"],c:1,tema:"analogia"},
+ {q:"No estudió, ___ desaprobó",ops:["por eso","aunque","pero","si","cuando"],c:0,tema:"conectores"}
+ ],
+ mat:[
+ {q:"Si 2 lapiceros cuestan S/6, ¿5 cuánto?",ops:["S/15","S/10","S/12","S/18","S/20"],c:0,tema:"regla de 3",g:"✏️✏️=S/6"},
+ {q:"Si 3 cuadernos S/12, ¿7 cuánto?",ops:["S/28","S/24","S/21","S/30","S/27"],c:0,tema:"regla de 3",g:"📓📓📓=S/12"},
+ {q:"Serie: 2,4,8,16...",ops:["24","20","32","30","18"],c:2,tema:"series",g:"2→4→8→16→?"},
+ {q:"Serie: 3,6,9,12...",ops:["15","18","14","13","16"],c:0,tema:"series",g:"3→6→9→12→?"},
+ {q:"Si a#b=a+b+1, calcula 3#4",ops:["8","7","9","10","6"],c:0,tema:"operadores",g:"a#b=a+b+1"},
+ {q:"Si a#b=2a+b, calcula 4#3",ops:["11","10","12","8","9"],c:0,tema:"operadores",g:"a#b=2a+b"},
+ {q:"Mitad de 100 es 50. ¿Mitad de la mitad?",ops:["25","30","20","50","10"],c:0,tema:"fracciones",g:"100→50→?"},
+ {q:"40 es el 20% de:",ops:["200","100","80","400","150"],c:0,tema:"porcentajes",g:"20%→40"},
+ {q:"¿Cuántos triángulos?",ops:["4","5","3","6","2"],c:0,tema:"conteo",g:"△\n△ △"},
+ {q:"El doble de 15 más 5",ops:["35","30","25","40","20"],c:0,tema:"basico",g:"15x2+5"}
+ ]
+};
+
+// ANTI-PLAGIO: genera examen único
+function generarExamenUnico(){
+ let v=[...BANCO_TOTAL.verbal].sort(()=>Math.random()-0.5).slice(0,5);
+ let m=[...BANCO_TOTAL.mat].sort(()=>Math.random()-0.5).slice(0,5);
+ let ex=[...v,...m].sort(()=>Math.random()-0.5); // orden diferente para cada usuario
+ return ex.map(p=>{
+   // mezcla alternativas para que no copien "la A"
+   let ops = p.ops.map((op,i)=>({op,i})).sort(()=>Math.random()-0.5);
+   let nuevoC = ops.findIndex(x=>x.i===p.c);
+   return {...p, ops:ops.map(x=>x.op), c:nuevoC, id:Math.random().toString(36).slice(2,6), q0:p.q, ops0:[...p.ops]};
+ });
+}
+let reto10=generarExamenUnico();
+
+async function cambiarIdioma(){
+ LANG=document.getElementById('idioma').value;
+ for(let p of reto10){ p.q = await traducirIA(p.q0, LANG); }
+ show();
+}
+
+async function show(){
+ if(fase==="reto"){
+   if(idx>=10){ mostrarPuntaje(); return; }
+   let p=reto10[idx];
+   p.q = await traducirIA(p.q0, LANG);
+   let html=`<div style="font-size:11px;color:#64748b">${T[LANG].preg} ${idx+1}/10 - ID:${p.id} - ${T[LANG].trad}</div><h3>${p.q}</h3>`;
+   if(p.g) html+=`<div style="background:#f1f5f9;padding:12px;border-radius:12px;font-size:20px">${p.g}</div>`;
+   p.ops.forEach((op,i)=> html+=`<button onclick="responder(${i})" id="b${i}">${String.fromCharCode(65+i)}) ${op}</button>`);
+   document.getElementById('box').innerHTML=html;
+   document.getElementById('fill').style.width=((idx+1)*10)+"%";
+ } else {
+   if(cola.length===0){document.getElementById('box').innerHTML=`<h2>🎉 ${T[LANG].puntaje}: ${pts}/10</h2><button onclick="location.reload()" style="text-align:center;background:#0f172a;color:white">Nuevo reto único</button>`;return}
+   let p=cola[0];let html=`<div style="font-size:11px">🤖 IA: ${p.tema} - ID:${p.id}</div><h3>${p.q}</h3>`;
+   if(p.g) html+=`<div style="background:#f1f5f9;padding:12px;border-radius:12px">${p.g}</div>`;
+   p.ops.forEach((op,i)=> html+=`<button onclick="responder(${i})">${String.fromCharCode(65+i)}) ${op}</button>`);
+   document.getElementById('box').innerHTML=html;
+ }
+}
+
+function responder(sel){
+ let p=fase==="reto"?reto10[idx]:cola[0];let ok=sel===p.c;
+ document.querySelectorAll('#box button').forEach((b,i)=>{if(i===p.c)b.classList.add('correct');else if(i===sel)b.classList.add('wrong');b.disabled=true});
+ if(fase==="reto"){if(ok){pts++;aciertos.push(p)}else falladas.push(p);setTimeout(()=>{idx++;show()},800)}
+ else{document.getElementById('box').innerHTML+=`<div style="background:#fef3c7;padding:10px;border-radius:10px;margin-top:10px;font-size:13px"><b>IA ${LANG}:</b> ${ok?'✅':'❌ Era '+String.fromCharCode(65+p.c)}</div><button onclick="sig(${ok})" style="text-align:center;background:#0f172a;color:white;margin-top:10px">${T[LANG].cont} →</button>`}
+}
+
+function sig(ok){if(ok)cola.shift();else{let a=Math.floor(Math.random()*5)+2,b=Math.floor(Math.random()*5)+2;let n={q:`Si a#b=a*${a}+${b}, calcula ${a}#${b}`,ops:[`${a*a+b}`,`${a+b}`,`${a*b}`,`${a+a}`,`${b*b}`].sort(()=>Math.random()-0.5),c:0,tema:cola[0].tema,g:`a#b=a*${a}+${b}`,id:Math.random().toString(36).slice(2,5)};cola.push(n);cola.shift();cola.unshift(n)}show()}
+function mostrarPuntaje(){fase="p";let h=`<h2>${T[LANG].puntaje}</h2><h1 style="font-size:48px">${pts}/10</h1><p>${pts>=6?T[LANG].ok:T[LANG].no}</p>`;h+=`<div style="background:#f8fafc;padding:10px;border-radius:10px;text-align:left;font-size:12px"><b>Anti-plagio ID:</b> ${Date.now().toString(36)}<br>Fallaste: ${falladas.map(f=>f.tema).join(', ')||'nada'}</div>`;h+=falladas.length?`<button onclick="iniciar()" style="text-align:center;background:#22c55e;color:white">${T[LANG].ia} (${falladas.length*2})</button>`:`<button onclick="location.reload()" style="text-align:center;background:#0f172a;color:white">Nuevo único</button>`;document.getElementById('box').innerHTML=h;document.getElementById('fill').style.width="100%"}
+function iniciar(){fase="practica";falladas.forEach(f=>{cola.push(f);cola.push({q:`Nuevo ${f.tema} (IA)`,q0:`Nuevo ${f.tema}`,ops:["10","20","30","40","50"].sort(()=>Math.random()-0.5),c:0,tema:f.tema,id:Math.random().toString(36).slice(2,5)})});show()}
+
+show();
+</script>
+</body>
+  </html>
