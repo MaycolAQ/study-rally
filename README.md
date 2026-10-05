@@ -1,40 +1,23 @@
-# Study Rally 🇵🇪 - Win Your University Seat
+# 🎮 Study Rally - Monday Contest
 
-> You are the protagonist. Level up your skills and win your university vacancy.
+> Test your brain! 10 challenges, live ranking & adaptive AI.
 
-A retro RPG educational game made in Arequipa, Peru.
+🚀 **Play now:** https://maycolaq.github.io/study-rally/
 
-### 🎮 How to Play
-1. Choose your name
-2. Start with Razonamiento Verbal
-3. Answer 5 questions - 3 lives
-4. Earn XP and level up
-5. Unlock Razonamiento Matemático
+### 🏆 How it works?
+- 10 random questions
+- Name optional (skip with Cancel / Enter)
+- Top 15 Live Ranking
+- Adaptive AI - trains your weak spots
 
-### 📚 Topics Included
-- **Phase 1:** Razonamiento Verbal (Sinónimos, Antónimos, Analogías)
-- **Phase 2:** Razonamiento Matemático (Porcentajes, Series, Edades)
-- **Phase 3:** Cultura General (Locked - Coming Week 5)
-- **Phase 4:** Final Simulacro (Coming Week 6)
+### 🛠️ Built with
+JavaScript | LocalStorage | Adaptive AI | 100% Frontend
 
-### ⚡ Features
-- 3 Lives System ❤️
-- XP & Level System
-- Topic Unlock
-- 100% Offline - No backend needed
+### 📲 Support me
+If you like it, leave a ⭐ and share your score on WhatsApp!
 
-### 🛠️ Tech Stack
-- HTML5
-- CSS3 (Retro RPG Style)
-- Vanilla JavaScript
-- JSON for questions
-
-### 🚀 Run Locally
-```bash
-git clone https://github.com/MaycolAQ/study-rally
-cd study-rally
-# Just open index.html
-Made with ❤️ from Cayma, Arequipa.
+### 🎯 For Monday Contest
+Ready to win! No bugs, fast & fun.
 
 ---
-**Decode:** ... - ..- -.. -.-- / .-. .- .-.. .-.. -.--
+Made with ❤️ by **MaycolAQ**
