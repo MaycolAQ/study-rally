@@ -21,19 +21,41 @@ select{background:#1e293b;color:white;border-radius:8px;padding:8px;border:1px s
 <option value="pt">🇧🇷 Português</option>
 <option value="fr">🇫🇷 Français</option>
 </select>
-</div>
-<div id="estado" style="color:#94a3b8;font-size:12px">🌐 Anti-plagio + Traducción IA real</div>
-<div class="bar"><div id="fill"></div></div>
-<div id="box">Cargando...</div>
 <script>
 let LANG="es", idx=0, pts=0, falladas=[], fase="reto", cola=[];
 let T={ es:{preg:"Pregunta",puntaje:"Tu puntaje",ia:"🧠 IA",cont:"Continuar",trad:"Traducido por IA"}, en:{preg:"Question",puntaje:"Your Score",ia:"🧠 AI Learning",cont:"Continue",trad:"Translated by AI"}, pt:{preg:"Pergunta",puntaje:"Sua nota",ia:"🧠 Aprendizado IA",cont:"Continuar",trad:"Traduzido por IA"}, fr:{preg:"Question",puntaje:"Score",ia:"🧠 Apprentissage IA",cont:"Continuer",trad:"Traduit par IA"} };
 
 // TRADUCTOR QUE TRADUCE TODO - preguntas y alternativas
 async function traducirIA(texto, lang){
- if(lang==="es" ||!texto) return texto;
  try{
-   let r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=es|${lang}`);
+  let cacheTraduccion={};
+async function traducirIA(texto, lang){
+ if(lang==="es"||!texto) return texto;
+ let key=lang+"|"+texto; if(cacheTraduccion[key]) return cacheTraduccion[key];
+ try{let r=await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(texto)}&langpair=es|${lang}`);let j=await r.json();let t=j.responseData.translatedText||texto;cacheTraduccion[key]=t;return t;}catch(e){return texto;}
+}
+async function cambiarIdioma(){
+ LANG=document.getElementById('idioma').value;
+ document.getElementById('estado').innerText="🌐 Traduciendo...";
+ let p=reto10[idx];
+ if(p){ p.q=await traducirIA(p.q0,LANG); for(let i=0;i<p.ops0.length;i++) p.ops[i]=await traducirIA(p.ops0[i],LANG); }
+ document.getElementById('estado').innerText=`🌐 ${T[LANG].trad}`;
+ show();
+}
+async function show(){
+ if(fase==="reto"){
+   if(idx>=10){let h=`<h2>${T[LANG].puntaje}</h2><h1 style="font-size:48px">${pts}/10</h1>`;h+=falladas.length?`<button onclick="iniciar()" style="text-align:center;background:#22c55e;color:white">${T[LANG].ia}</button>`:`<button onclick="location.reload()" style="text-align:center;background:#0f172a;color:white">Nuevo</button>`;document.getElementById('box').innerHTML=h;return}
+   let p=reto10[idx];
+   if(LANG!=="es" && p.q===p.q0){
+     document.getElementById('box').innerHTML=`<div style="padding:40px">🌐 Traduciendo IA...<br><small>${p.q0}</small></div>`;
+     p.q=await traducirIA(p.q0,LANG); for(let i=0;i<p.ops0.length;i++) p.ops[i]=await traducirIA(p.ops0[i],LANG);
+   }
+   let html=`<div style="font-size:11px">${T[LANG].preg} ${idx+1}/10 ID:${p.id} ${T[LANG].trad}</div><h3>${p.q}</h3>`;if(p.g)html+=`<div style="background:#f1f5f9;padding:10px;border-radius:10px">${p.g}</div>`;p.ops.forEach((op,i)=>html+=`<button onclick="responder(${i})">${String.fromCharCode(65+i)}) ${op}</button>`);document.getElementById('box').innerHTML=html;document.getElementById('fill').style.width=((idx+1)*10)+"%"
+ }else{
+   if(cola.length===0){document.getElementById('box').innerHTML=`<h2>🎉 ${pts}/10</h2><button onclick="location.reload()" style="text-align:center;background:#0f172a;color:white">Nuevo reto</button>`;return}
+   let p=cola[0];let html=`<div>🤖 ${p.tema}</div><h3>${p.q}</h3>`;p.ops.forEach((op,i)=>html+=`<button onclick="responder(${i})">${String.fromCharCode(65+i)}) ${op}</button>`);document.getElementById('box').innerHTML=html
+ }
+}
    let j=await r.json();
    return j.responseData.translatedText || texto;
  }catch(e){ return texto; }
