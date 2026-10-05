@@ -1,0 +1,29 @@
+name: "💡 Idea de Mejora"
+description: "Propón una feature para Study Rally"
+title: "[Idea] "
+labels: ["enhancement"]
+body:
+    - type: textarea
+    id: idea
+    attributes:
+      label: "¿Cuál es tu idea?"
+      description: "Describe qué le agregarías al juego"
+      placeholder: "Ej: agregar sonidos cuando aciertas, tabla de líderes, modo oscuro..."
+    validations:
+      required: true
+    - type: dropdown
+    id: level
+    attributes:
+      label: "Dificultad"
+      options:
+                - Fácil (para nuevos)
+                - Media
+                - Difícil
+    validations:
+      required: true
+    - type: checkboxes
+    id: check
+    attributes:
+      label: "¿Quieres hacerlo tú?"
+      options:
+                - label: "Sí, puedo hacer un PR de esto"
